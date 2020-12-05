@@ -64,10 +64,13 @@ func (app *App) WithContext(route interface{}, method string) gin.HandlerFunc {
 
 		// 反射设置上下文
 		e := reflect.ValueOf(route).Elem()
-		e.FieldByName("Context").Set(reflect.ValueOf(&myContext.Context{
-			TimeoutCtx: timeoutCtx,
-			Context:    ginCtx,
-		}))
+		controller := &myContext.Controller{
+			Context: &myContext.Context{
+				TimeoutCtx: timeoutCtx,
+				Context:    ginCtx,
+			},
+		}
+		e.FieldByName("Controller").Set(reflect.ValueOf(controller))
 
 		m := reflect.ValueOf(route).MethodByName(method)
 		m.Call(make([]reflect.Value, 0))
