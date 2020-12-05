@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"reflect"
 	"runtime"
 	"syscall"
 	"time"
@@ -53,27 +52,20 @@ func (app *App) init() {
 func (app *App) registerMiddleware() {
 	// Todo: 一些自带的中间件
 	app.Use(middleware.Logger())
+	app.Use(gin.Recovery())
 }
 
-func (app *App) WithContext(route interface{}, method string) gin.HandlerFunc {
+func (app *App) WithContext(handleFunc myContext.HandleFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		// 请求超时控制
 		withTimeout := time.Duration(app.Conf.WithTimeout) * time.Millisecond
 		timeoutCtx, cancelFunc := context.WithTimeout(ginCtx, withTimeout)
 		defer cancelFunc()
 
-		// 反射设置上下文
-		e := reflect.ValueOf(route).Elem()
-		controller := &myContext.Controller{
-			Context: &myContext.Context{
-				TimeoutCtx: timeoutCtx,
-				Context:    ginCtx,
-			},
-		}
-		e.FieldByName("Controller").Set(reflect.ValueOf(controller))
-
-		m := reflect.ValueOf(route).MethodByName(method)
-		m.Call(make([]reflect.Value, 0))
+		handleFunc(&myContext.Context{
+			TimeoutCtx: timeoutCtx,
+			Context:    ginCtx,
+		})
 	}
 }
 

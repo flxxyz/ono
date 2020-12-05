@@ -7,18 +7,14 @@ import (
 	"io/ioutil"
 )
 
-type HandleFunc func()
+type HandleFunc func(ctx *Context)
 
 type Context struct {
 	TimeoutCtx context.Context
 	*gin.Context
 }
 
-type Controller struct {
-	*Context
-}
-
-func (c *Controller) RequestBody(data interface{}) interface{} {
+func (c *Context) RequestBody(data interface{}) interface{} {
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	_ = json.Unmarshal(body, data)
 	return data
