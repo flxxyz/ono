@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/flxxyz/ono/conf"
-	myContext "github.com/flxxyz/ono/context"
 	"github.com/flxxyz/ono/middleware"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -55,14 +54,14 @@ func (app *App) registerMiddleware() {
 	app.Use(gin.Recovery())
 }
 
-func (app *App) WithContext(handleFunc myContext.HandleFunc) gin.HandlerFunc {
+func (app *App) WithContext(handleFunc HandleFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		// 请求超时控制
 		withTimeout := time.Duration(app.Conf.WithTimeout) * time.Millisecond
 		timeoutCtx, cancelFunc := context.WithTimeout(ginCtx, withTimeout)
 		defer cancelFunc()
 
-		handleFunc(&myContext.Context{
+		handleFunc(&Context{
 			TimeoutCtx: timeoutCtx,
 			Context:    ginCtx,
 		})
