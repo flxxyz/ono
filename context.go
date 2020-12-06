@@ -24,14 +24,14 @@ func (c *Context) RequestBody(data interface{}) interface{} {
 }
 
 func (c *Context) Success(message string) {
-	c.JSON(http.StatusOK, H{
+	c.Response(http.StatusOK, H{
 		"code":    0,
 		"message": message,
 	})
 }
 
 func (c *Context) Fail(message string) {
-	c.JSON(http.StatusOK, H{
+	c.Response(http.StatusOK, H{
 		"code":    1,
 		"message": message,
 	})
