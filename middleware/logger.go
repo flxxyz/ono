@@ -6,7 +6,7 @@ import (
 )
 
 func Logger() gin.HandlerFunc {
-	if conf.DefaultAppConfig().Debug {
+	if conf.DefaultCommonConf().Debug {
 		return gin.Logger()
 	} else {
 		return func(context *gin.Context) {

@@ -8,8 +8,7 @@ import (
 var Cfg *goconfig.ConfigFile
 
 func init() {
-	var err error
-	Cfg, err = goconfig.LoadConfigFile("./conf/app.ini")
+	err := Load("./conf/app.ini")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,6 +18,14 @@ func init() {
 func GetAppConf() *goconfig.ConfigFile {
 	_ = Reload()
 	return Cfg
+}
+
+func Load(filename string, moreFiles ...string) (err error) {
+	Cfg, err = goconfig.LoadConfigFile(filename, moreFiles...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
 }
 
 func Reload() error {
