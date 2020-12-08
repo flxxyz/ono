@@ -16,15 +16,15 @@ import (
 
 type App struct {
 	*gin.Engine
-	Conf *conf.AppConfig
+	cfg *conf.AppConfig
 }
 
 func (app *App) Run() (err error) {
 	srv := &http.Server{
-		Addr:         app.Conf.Addr,
+		Addr:         app.cfg.Addr,
 		Handler:      app.Engine,
-		ReadTimeout:  time.Duration(app.Conf.ReadTimeout) * time.Millisecond,
-		WriteTimeout: time.Duration(app.Conf.WriteTimeout) * time.Millisecond,
+		ReadTimeout:  time.Duration(app.cfg.ReadTimeout) * time.Millisecond,
+		WriteTimeout: time.Duration(app.cfg.WriteTimeout) * time.Millisecond,
 	}
 
 	go func() {
@@ -39,7 +39,7 @@ func (app *App) Run() (err error) {
 }
 
 func (app *App) init() {
-	if app.Conf.Debug {
+	if app.cfg.Debug {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -57,7 +57,7 @@ func (app *App) registerMiddleware() {
 func (app *App) WithContext(handleFunc HandleFunc) gin.HandlerFunc {
 	return func(ginCtx *gin.Context) {
 		// 请求超时控制
-		withTimeout := time.Duration(app.Conf.WithTimeout) * time.Millisecond
+		withTimeout := time.Duration(app.cfg.WithTimeout) * time.Millisecond
 		timeoutCtx, cancelFunc := context.WithTimeout(ginCtx, withTimeout)
 		defer cancelFunc()
 
@@ -85,7 +85,7 @@ func (app *App) waitGraceExit(srv *http.Server) {
 }
 
 func (app *App) Addr() string {
-	return app.Conf.Addr
+	return app.cfg.Addr
 }
 
 func init() {
@@ -94,8 +94,9 @@ func init() {
 }
 
 func New() (app *App, err error) {
+	cfg := conf.DefaultCommonConf()
 	app = &App{
-		Conf: conf.DefaultAppConfig(),
+		cfg: &cfg,
 	}
 	// 初始化框架
 	app.init()
