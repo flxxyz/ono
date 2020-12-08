@@ -24,21 +24,22 @@ func (c *Context) RequestBody(data interface{}) interface{} {
 }
 
 func (c *Context) Success(message string) {
-	c.Response(http.StatusOK, H{
-		"code":    0,
-		"message": message,
-	})
+	c.JSON(http.StatusOK, NewBody(0, message))
 }
 
 func (c *Context) Fail(message string) {
-	c.Response(http.StatusOK, H{
-		"code":    1,
-		"message": message,
-	})
+	c.JSON(http.StatusOK, NewBody(1, message))
 }
 
-func (c *Context) Response(code int, data interface{}) {
-	c.JSON(code, H{
-		"data": data,
-	})
+func (c *Context) Response(code int, message string, data interface{}) {
+	obj := NewBody(code, message)
+	obj["data"] = data
+	c.JSON(http.StatusOK, obj)
+}
+
+func NewBody(code int, message string) H {
+	return H{
+		"code":    code,
+		"message": message,
+	}
 }
