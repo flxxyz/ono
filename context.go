@@ -38,5 +38,7 @@ func (c *Context) Fail(message string) {
 }
 
 func (c *Context) Response(code int, data interface{}) {
-	c.JSON(code, data)
+	c.JSON(code, H{
+		"data": data,
+	})
 }
